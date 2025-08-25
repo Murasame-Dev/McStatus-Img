@@ -33,12 +33,14 @@ def draw_motd_text_with_shadow(image: Image.Image, text: str, posx: int, posy: i
     font_size = 10
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype("./MiSans-Bold.ttf", font_size)
-    w1, _, w2, _ = draw.textbbox((0, 0), text, font=font)
+    w1, _, w2, _ = draw.textbbox((0, 0), text.strip(), font=font)
     weight = w2 - w1
-    motd_list = foramt_motd(text, weight)
+    motd_list = foramt_motd(text.strip(), weight)
     for pos, color, text in motd_list:
-        draw.text((posx + pos + 1, posy + 1), text, font=font, fill='black')
-        draw.text((posx + pos, posy), text, font=font, fill=getrgb(color))
+        w1, _, w2, _ = draw.textbbox((0, 0), text, font=font)
+        weight = w2 - w1
+        draw.text((posx + pos + 1 - weight, posy + 1), text, font=font, fill='black')
+        draw.text((posx + pos - weight, posy), text, font=font, fill=getrgb(color))
 
 def create_image(background: bytes, icon: str | None, text_list: list[str], motd_list: list[str]):
     # 图片尺寸

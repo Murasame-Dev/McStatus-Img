@@ -65,5 +65,5 @@ def foramt_motd(data: str, weight: int) -> list[tuple[int, str, str]]:
             while iter < data_size and data[iter] != "§" and data[iter] != "\n":
                 text += data[iter]
                 iter += 1
-            motd_list.append((len(text), "white", text))
+            motd_list.append(((iter - character_count * 2) / data_size * weight, "white", text))
     return motd_list
