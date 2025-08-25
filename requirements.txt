@@ -1,0 +1,2 @@
+pillow
+mcstatus >= 12.0.5
