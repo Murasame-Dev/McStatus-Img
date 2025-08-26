@@ -16,13 +16,18 @@ import asyncio
 BACKGROUND_URL = "https://www.loliapi.com/acg/"
 DEFAULT_ICON = "./minecraft-creeper-face.png"
 
-if DEFAULT_ICON.startswith("http"):
-    default_icon = asyncio.run(download_image_with_httpx_auto_redirect(DEFAULT_ICON))
-    if not default_icon:
-        default_icon = None
-else:
-    with open(DEFAULT_ICON, "rb") as f:
-        default_icon = f.read()
+async def get_icon_image(url: str):
+    if url.startswith("http"):
+        icon_data = await download_image_with_httpx_auto_redirect(url)
+        if icon_data:
+            return icon_data
+        else:
+            return None
+    else:
+        def read_file(path):
+            with open(path, "rb") as f:
+                return f.read()
+        return await asyncio.to_thread(read_file, url)
 
 async def generate_java_status_image(addr: str):
     loop = asyncio.get_event_loop()
@@ -37,7 +42,11 @@ async def generate_java_status_image(addr: str):
     background_data = await download_image_with_httpx_auto_redirect(BACKGROUND_URL)
     if not background_data:
         background_data = None
-    
+        
+    image_data = await get_icon_image(DEFAULT_ICON)
+    if not image_data:
+        image_data = None   
+            
     motd_list = data['motd'].split("\n")
     text_list = [
         f"ip: {data['ip']}",
@@ -58,7 +67,7 @@ async def generate_java_status_image(addr: str):
         image = await loop.run_in_executor(None,
                                            create_image,
                                            background_data,
-                                           default_icon,
+                                           image_data,
                                            text_list,
                                            motd_list)
     return image
@@ -76,6 +85,10 @@ async def generate_bedrock_status_image(addr: str):
     background_data = await download_image_with_httpx_auto_redirect(BACKGROUND_URL)
     if not background_data:
         background_data = None
+        
+    image_data = await get_icon_image(DEFAULT_ICON)
+    if not image_data:
+        image_data = None   
     
     motd_list = data['motd'].split("\n")
     text_list = [
@@ -88,7 +101,7 @@ async def generate_bedrock_status_image(addr: str):
     image = await loop.run_in_executor(None,
                                            create_image,
                                            background_data,
-                                           default_icon,
+                                           image_data,
                                            text_list,
                                            motd_list)
     return image
