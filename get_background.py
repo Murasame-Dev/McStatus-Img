@@ -1,6 +1,6 @@
 import httpx
 
-def download_image_with_httpx_auto_redirect(url:str):
+async def download_image_with_httpx_auto_redirect(url:str):
     """
     使用httpx库自动处理重定向下载图片
     
@@ -10,9 +10,9 @@ def download_image_with_httpx_auto_redirect(url:str):
     """
     try:
         # httpx默认也会自动跟随重定向
-        with httpx.Client(follow_redirects=True) as client:
-            response = client.get(url, timeout=30.0)
-        
+        async with httpx.AsyncClient(follow_redirects=True) as client:
+            response = await client.get(url, timeout=30.0)
+
         # 检查状态码
         if response.status_code == 200:
             Background = response.content

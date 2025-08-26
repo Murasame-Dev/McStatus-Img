@@ -11,19 +11,21 @@ from mc_status_api.dnslookup import dns_lookup
 from mc_status_api.FormatData import format_java_data, format_bedrock_data, format_index, format_java_index, format_bedrock_index
 
 import base64
+import asyncio
 
 BACKGROUND_URL = "https://www.loliapi.com/acg/"
 
-def generate_java_status_image(addr: str):
+async def generate_java_status_image(addr: str):
+    loop = asyncio.get_event_loop()
     try:
-        ip, type = dns_lookup(addr)
-        status = java_status(ip)
+        ip, type = await loop.run_in_executor(None, dns_lookup, addr)
+        status = await loop.run_in_executor(None, java_status, ip)
         data = format_java_data(ip, type, status)
     except Exception as e:
         print(f"查询服务器时出错: {e}")
         return
     
-    background_data = download_image_with_httpx_auto_redirect(BACKGROUND_URL)
+    background_data = await download_image_with_httpx_auto_redirect(BACKGROUND_URL)
     if not background_data:
         background_data = None
     
@@ -37,12 +39,22 @@ def generate_java_status_image(addr: str):
     ]
 
     if status.icon:
-        image = create_image(background_data, base64.b64decode(status.icon.split(",")[1]), text_list, motd_list)
+        image = await loop.run_in_executor(None,
+                                           create_image,
+                                           background_data,
+                                           base64.b64decode(status.icon.split(",")[1]),
+                                           text_list,
+                                           motd_list)
     else:
-        image = create_image(background_data, None, text_list, motd_list)
+        image = await loop.run_in_executor(None,
+                                           create_image,
+                                           background_data,
+                                           None,
+                                           text_list,
+                                           motd_list)
     return image
 
 if __name__ == "__main__":
-    image = generate_java_status_image("mc.hypixel.net")
+    image = asyncio.run(generate_java_status_image("mc.hypixel.net"))
     if image:
         image.save("output_image.png")

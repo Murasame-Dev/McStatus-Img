@@ -18,7 +18,8 @@ def create_background(input: bytes, width: int, height: int):
                                   midh - int(rheight / 2),
                                   midw + int(rwidth / 2),
                                   midh + int(rheight / 2)))
-    background = background.resize((width, height), Image.Resampling.LANCZOS)
+    background = background.resize((width, height),
+                                   Image.Resampling.LANCZOS)
 
     blurred_background = background.filter(ImageFilter.GaussianBlur(radius=5))
     
@@ -51,7 +52,10 @@ def draw_motd_text_with_shadow(image: Image.Image,
         draw.text((posx + pos + 1 - weight, posy + 1), text, font=font, fill='black')
         draw.text((posx + pos - weight, posy), text, font=font, fill=getrgb(color))
 
-def create_image(background: bytes, icon: str | None, text_list: list[str], motd_list: list[str]):
+def create_image(background: bytes,
+                 icon: str | None,
+                 text_list: list[str],
+                 motd_list: list[str]):
     # 图片尺寸
     width, height = 1200, 400
     if (len(text_list) + len(motd_list)) * 20 + 20 > height:
@@ -77,7 +81,8 @@ def create_image(background: bytes, icon: str | None, text_list: list[str], motd
     if icon == None:
         small_image = Image.new('RGBA', (small_size, small_size), color='gray')
     else:
-        small_image = Image.open(BytesIO(icon)).resize((small_size, small_size), Image.Resampling.LANCZOS)
+        small_image = Image.open(BytesIO(icon)).resize((small_size, small_size),
+                                                       Image.Resampling.LANCZOS)
 
     image.paste(small_image, (30, height // 2 - small_size // 2))
 
