@@ -27,7 +27,8 @@ async def get_icon_image(url: str):
         def read_file(path):
             with open(path, "rb") as f:
                 return f.read()
-        return await asyncio.to_thread(read_file, url)
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, read_file, url)
 
 async def generate_java_status_image(addr: str):
     loop = asyncio.get_event_loop()
