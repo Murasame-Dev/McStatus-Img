@@ -14,6 +14,21 @@ import base64
 import asyncio
 
 BACKGROUND_URL = "https://www.loliapi.com/acg/"
+DEFAULT_ICON = "./minecraft-creeper-face.png"
+
+async def get_icon_image(url: str):
+    if url.startswith("http"):
+        icon_data = await download_image_with_httpx_auto_redirect(url)
+        if icon_data:
+            return icon_data
+        else:
+            return None
+    else:
+        def read_file(path):
+            with open(path, "rb") as f:
+                return f.read()
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, read_file, url)
 
 async def generate_java_status_image(addr: str):
     loop = asyncio.get_event_loop()
@@ -28,7 +43,9 @@ async def generate_java_status_image(addr: str):
     background_data = await download_image_with_httpx_auto_redirect(BACKGROUND_URL)
     if not background_data:
         background_data = None
-    
+        
+    icon_data = await get_icon_image(DEFAULT_ICON)
+            
     motd_list = data['motd'].split("\n")
     text_list = [
         f"ip: {data['ip']}",
@@ -49,7 +66,41 @@ async def generate_java_status_image(addr: str):
         image = await loop.run_in_executor(None,
                                            create_image,
                                            background_data,
-                                           None,
+                                           image_data,
+                                           text_list,
+                                           motd_list)
+    return image
+
+async def generate_bedrock_status_image(addr: str):
+    loop = asyncio.get_event_loop()
+    try:
+        ip, type = await loop.run_in_executor(None, dns_lookup, addr)
+        status = await loop.run_in_executor(None, bedrock_status, ip)
+        data = format_bedrock_data(ip, status)
+    except Exception as e:
+        print(f"查询服务器时出错: {e}")
+        return
+    
+    background_data = await download_image_with_httpx_auto_redirect(BACKGROUND_URL)
+    if not background_data:
+        background_data = None
+        
+    image_data = await get_icon_image(DEFAULT_ICON)
+    if not image_data:
+        image_data = None   
+    
+    motd_list = data['motd'].split("\n")
+    text_list = [
+        f"ip: {data['ip']}",
+        f"version: {data['version']}",
+        f"latency: {round(data['latency'], 2)} ms",
+        f"players: {data['players']['online']}/{data['players']['max']}",
+    ]
+
+    image = await loop.run_in_executor(None,
+                                           create_image,
+                                           background_data,
+                                           image_data,
                                            text_list,
                                            motd_list)
     return image
@@ -58,3 +109,7 @@ if __name__ == "__main__":
     image = asyncio.run(generate_java_status_image("mc.hypixel.net"))
     if image:
         image.save("output_image.png")
+        
+    image = asyncio.run(generate_bedrock_status_image("play.cubecraft.net"))
+    if image:
+        image.save("output_image-be.png")
