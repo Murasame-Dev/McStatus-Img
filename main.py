@@ -44,9 +44,7 @@ async def generate_java_status_image(addr: str):
     if not background_data:
         background_data = None
         
-    image_data = await get_icon_image(DEFAULT_ICON)
-    if not image_data:
-        image_data = None   
+    icon_data = await get_icon_image(DEFAULT_ICON)
             
     motd_list = data['motd'].split("\n")
     text_list = [
