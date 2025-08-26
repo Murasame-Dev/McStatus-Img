@@ -14,7 +14,10 @@ def create_background(input: bytes, width: int, height: int):
         rwidth = int(width / height * h2)
         rheight = h2
     
-    background = background.crop((midw - int(rwidth / 2), midh - int(rheight / 2), midw + int(rwidth / 2), midh + int(rheight / 2)))
+    background = background.crop((midw - int(rwidth / 2),
+                                  midh - int(rheight / 2),
+                                  midw + int(rwidth / 2),
+                                  midh + int(rheight / 2)))
     background = background.resize((width, height), Image.Resampling.LANCZOS)
 
     blurred_background = background.filter(ImageFilter.GaussianBlur(radius=5))
@@ -22,15 +25,21 @@ def create_background(input: bytes, width: int, height: int):
     image = blurred_background
     return image
 
-def draw_text_with_shadow(image: Image.Image, text: str, posx: int, posy: int):
-    font_size = 14
+def draw_text_with_shadow(image: Image.Image,
+                          text: str,
+                          posx: int,
+                          posy: int,
+                          font_size: int):
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype("./MiSans-Bold.ttf", font_size)
     draw.text((posx + 2, posy + 2), text, font=font, fill='black')
     draw.text((posx, posy), text, font=font, fill='white')
 
-def draw_motd_text_with_shadow(image: Image.Image, text: str, posx: int, posy: int):
-    font_size = 10
+def draw_motd_text_with_shadow(image: Image.Image,
+                               text: str,
+                               posx: int,
+                               posy: int,
+                               font_size: int):
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype("./MiSans-Bold.ttf", font_size)
     w1, _, w2, _ = draw.textbbox((0, 0), text.strip(), font=font)
@@ -44,9 +53,13 @@ def draw_motd_text_with_shadow(image: Image.Image, text: str, posx: int, posy: i
 
 def create_image(background: bytes, icon: str | None, text_list: list[str], motd_list: list[str]):
     # 图片尺寸
-    width, height = 600, 200
+    width, height = 1200, 400
     if (len(text_list) + len(motd_list)) * 20 + 20 > height:
-        height = len(text_list) * 20 + 20
+        height = (len(text_list) + len(motd_list)) * 20 + 20
+    else:
+        font_size = height // 12
+    if font_size * 20 > width - width // 2.5:
+        font_size = (width - width // 2.5) // 20
     
     try:
         image = create_background(background, width, height)
@@ -70,9 +83,18 @@ def create_image(background: bytes, icon: str | None, text_list: list[str], motd
 
     text_list_size = len(text_list)
     motd_list_size = len(motd_list)
+    start_posy = height / 2 - (text_list_size + motd_list_size) / 2 * font_size * 1.2
     for i in range(text_list_size):
-        draw_text_with_shadow(image, text_list[i], width // 2.5, 10 + 20 * i)
+        draw_text_with_shadow(image,
+                              text_list[i],
+                              width // 2.5,
+                              start_posy + font_size * 1.2 * i,
+                              font_size)
     for i in range(motd_list_size):
-        draw_motd_text_with_shadow(image, motd_list[i], width // 2.5, 10 + 20 * (i + text_list_size))
+        draw_motd_text_with_shadow(image,
+                                   motd_list[i],
+                                   width // 2.5,
+                                   start_posy + font_size * 1.2 * (i + text_list_size),
+                                   int(font_size * 0.8))
     
     return image

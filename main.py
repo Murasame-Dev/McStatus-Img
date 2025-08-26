@@ -32,7 +32,7 @@ def generate_java_status_image(addr: str):
         f"ip: {data["ip"]}",
         f"type: {data['type']}",
         f"version: {data['version']}",
-        f"latency: {data['latency']} ms",
+        f"latency: {round(data['latency'], 2)} ms",
         f"players: {data['players']['online']}/{data['players']['max']}",
     ]
 
