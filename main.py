@@ -8,7 +8,7 @@ from mc_status_api.BedrockServerStatus import bedrock_status
 # 此API优先解析 srv 记录
 from mc_status_api.dnslookup import dns_lookup
 # 格式化文本
-from mc_status_api.FormatData import format_java_data, format_bedrock_data, format_index, format_java_index, format_bedrock_index
+from mc_status_api.FormatData import format_java_data, format_bedrock_data
 
 import base64
 import asyncio
@@ -66,7 +66,7 @@ async def generate_java_status_image(addr: str):
         image = await loop.run_in_executor(None,
                                            create_image,
                                            background_data,
-                                           image_data,
+                                           icon_data,
                                            text_list,
                                            motd_list)
     return image
@@ -85,9 +85,7 @@ async def generate_bedrock_status_image(addr: str):
     if not background_data:
         background_data = None
         
-    image_data = await get_icon_image(DEFAULT_ICON)
-    if not image_data:
-        image_data = None   
+    icon_data = await get_icon_image(DEFAULT_ICON)
     
     motd_list = data['motd'].split("\n")
     text_list = [
@@ -100,7 +98,7 @@ async def generate_bedrock_status_image(addr: str):
     image = await loop.run_in_executor(None,
                                            create_image,
                                            background_data,
-                                           image_data,
+                                           icon_data,
                                            text_list,
                                            motd_list)
     return image
