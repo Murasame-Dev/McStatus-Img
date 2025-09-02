@@ -1,3 +1,5 @@
+from PIL import ImageDraw, ImageFont
+
 def format_color(color_code: str) -> str:
     """
     将Minecraft颜色代码转换为对应的颜色名称
@@ -30,7 +32,10 @@ def format_color(color_code: str) -> str:
     }
     return color_map.get(color_code.lower(), 'white')
 
-def foramt_motd(data: str, weight: int) -> list[tuple[int, str, str]]:
+def foramt_motd(data: str,
+                draw: ImageDraw.ImageDraw,
+                font: ImageFont.ImageFont | ImageFont.FreeTypeFont
+                ) -> list[tuple[int, str, str]]:
     """
     格式化 MOTD 文本，去除多余的空格和换行符
     
@@ -41,23 +46,25 @@ def foramt_motd(data: str, weight: int) -> list[tuple[int, str, str]]:
         list: 格式化后的 MOTD 文本
     """
     iter = 0
-    character_count = 0
     motd_list = []
     color_state = "#FFFFFF"
     data_size = len(data)
+    weight_count = 0
     while iter < data_size:
         if data[iter] == "§":
             if iter + 1 < data_size:
                 color = data[iter + 1]
                 text = ""
                 iter += 2
-                character_count += 1
                 while iter < data_size and data[iter] != "§" and data[iter] != "\n":
                     text += data[iter]
                     iter += 1
                 if color != "l":
                     color_state = format_color(color)
-                motd_list.append(((iter - character_count * 2) / data_size * weight, color_state, text))
+                w1, _, w2, _ = draw.textbbox((0, 0), text, font=font)
+                seg_weight = w2 - w1
+                weight_count += seg_weight
+                motd_list.append((weight_count, color_state, text))
             else:
                 iter += 1
         else:
@@ -65,5 +72,8 @@ def foramt_motd(data: str, weight: int) -> list[tuple[int, str, str]]:
             while iter < data_size and data[iter] != "§" and data[iter] != "\n":
                 text += data[iter]
                 iter += 1
-            motd_list.append(((iter - character_count * 2) / data_size * weight, "white", text))
+            w1, _, w2, _ = draw.textbbox((0, 0), text, font=font)
+            seg_weight = w2 - w1
+            weight_count += seg_weight
+            motd_list.append((weight_count, "#FFFFFF", text))
     return motd_list

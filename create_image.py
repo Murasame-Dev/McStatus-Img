@@ -31,7 +31,7 @@ def draw_text_with_shadow(image: Image.Image,
                           text: str,
                           posx: int | float,
                           posy: int | float,
-                          font):
+                          font: ImageFont.ImageFont | ImageFont.FreeTypeFont):
     draw = ImageDraw.Draw(image)
     draw.text((posx + 2, posy + 2), text, font=font, fill='black')
     draw.text((posx, posy), text, font=font, fill='white')
@@ -40,16 +40,12 @@ def draw_motd_text_with_shadow(image: Image.Image,
                                text: str,
                                posx: int | float,
                                posy: int | float,
-                               font):
+                               font: ImageFont.ImageFont | ImageFont.FreeTypeFont):
     draw = ImageDraw.Draw(image)
-    w1, _, w2, _ = draw.textbbox((0, 0), text.strip(), font=font)
-    weight = w2 - w1
-    motd_list = foramt_motd(text.strip(), weight)
+    motd_list = foramt_motd(text.strip(), draw)
     for pos, color, text in motd_list:
-        w1, _, w2, _ = draw.textbbox((0, 0), text, font=font)
-        weight = w2 - w1
-        draw.text((posx + pos + 1 - weight, posy + 1), text, font=font, fill='black')
-        draw.text((posx + pos - weight, posy), text, font=font, fill=getrgb(color))
+        draw.text((posx + pos + 1, posy + 1), text, font=font, fill='black')
+        draw.text((posx + pos, posy), text, font=font, fill=getrgb(color))
 
 def create_image(background: bytes,
                  icon: str | None,
