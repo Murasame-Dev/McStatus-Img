@@ -91,7 +91,7 @@ def create_image(background: bytes,
         small_image = Image.open(BytesIO(icon)).resize((small_size, small_size),
                                                        Image.Resampling.LANCZOS)
 
-    image.paste(small_image, (int(width / 2.6 - small_size / 2), int(height / 2 - small_size / 2)))
+    image.paste(small_image, (int(width / 2.6 - small_size), int(height / 2 - small_size / 2)))
 
     # 设置字体
     if font_url == None:
