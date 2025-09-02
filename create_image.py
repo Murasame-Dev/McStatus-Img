@@ -31,7 +31,6 @@ def draw_text_with_shadow(image: Image.Image,
                           text: str,
                           posx: int,
                           posy: int,
-                          font_size: int,
                           font):
     draw = ImageDraw.Draw(image)
     draw.text((posx + 2, posy + 2), text, font=font, fill='black')
@@ -41,7 +40,6 @@ def draw_motd_text_with_shadow(image: Image.Image,
                                text: str,
                                posx: int,
                                posy: int,
-                               font_size: int,
                                font):
     draw = ImageDraw.Draw(image)
     w1, _, w2, _ = draw.textbbox((0, 0), text.strip(), font=font)
@@ -58,14 +56,16 @@ def create_image(background: bytes,
                  text_list: list[str],
                  motd_list: list[str],
                  font_url: str | None,
-                 image_size: list[int]):
+                 image_size: list[int] = [0, 0]):
     # 图片尺寸
     if image_size == [0, 0] or image_size == []:
         width = 1200
         height = 400
-    else:
+    elif len(image_size) == 2:
         width = image_size[0]
         height = image_size[1]
+    else:
+        assert ValueError("image_size is invalid")
         
     if (len(text_list) + len(motd_list)) * 20 + 20 > height:
         height = (len(text_list) + len(motd_list)) * 20 + 20
@@ -109,14 +109,12 @@ def create_image(background: bytes,
                                    motd_list[i],
                                    width // 2.5,
                                    start_posy + font_size * 1.2 * i,
-                                   int(font_size * 0.8),
                                    font)
     for i in range(text_list_size):
         draw_text_with_shadow(image,
                               text_list[i],
                               width // 2.5,
                               start_posy + font_size * 1.2 * (i + motd_list_size),
-                              font_size,
                               font)
     
     return image
