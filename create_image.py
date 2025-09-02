@@ -58,7 +58,7 @@ def create_image(background: bytes,
                  font_url: str | None,
                  image_size: list[int] = [0, 0]):
     # 图片尺寸
-    if image_size == [0, 0] or image_size == []:
+    if  type(image_size) == type(list()) and len(image_size) == 0:
         width = 1200
         height = 400
     elif len(image_size) == 2:
