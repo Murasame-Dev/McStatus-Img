@@ -106,13 +106,13 @@ def create_image(background: bytes,
     for i in range(motd_list_size):
         draw_motd_text_with_shadow(image,
                                    motd_list[i],
-                                   width // 2.5,
+                                   width / 2.5,
                                    start_posy + font_size * 1.2 * i,
                                    font)
     for i in range(text_list_size):
         draw_text_with_shadow(image,
                               text_list[i],
-                              width // 2.5,
+                              width / 2.5,
                               start_posy + font_size * 1.2 * (i + motd_list_size),
                               font)
     
