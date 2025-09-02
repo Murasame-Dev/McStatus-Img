@@ -56,16 +56,17 @@ def create_image(background: bytes,
                  text_list: list[str],
                  motd_list: list[str],
                  font_url: str | None,
-                 image_size: list[int] = [0, 0]):
+                 image_size: tuple[int, int] = (0, 0)):
     # 图片尺寸
-    if  type(image_size) == type(list()) and len(image_size) == 0:
+    if type(image_size) != type(tuple()) or len(image_size) != 2:
+        assert ValueError("image_size is invalid")
+    
+    if image_size[0] == 0 and image_size[1] == 0:
         width = 1200
         height = 400
-    elif len(image_size) == 2:
+    else:
         width = image_size[0]
         height = image_size[1]
-    else:
-        assert ValueError("image_size is invalid")
         
     if (len(text_list) + len(motd_list)) * 20 + 20 > height:
         height = (len(text_list) + len(motd_list)) * 20 + 20
