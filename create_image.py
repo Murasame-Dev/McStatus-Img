@@ -4,6 +4,14 @@ from PIL.ImageColor import getrgb
 
 from .motd_formatter import foramt_motd
 
+def load_font(font_url: str | None, font_size: int):
+    # 设置字体
+    if font_url == None:
+        font = ImageFont.load_default(font_size)
+    else:
+        font = ImageFont.truetype(font_url, font_size)
+    return font
+
 def create_background(input: bytes, width: int, height: int):
     background = Image.open(BytesIO(input))
     w1, h1, w2, h2 = background.getbbox()
@@ -31,8 +39,10 @@ def draw_text_with_shadow(image: Image.Image,
                           text: str,
                           posx: int | float,
                           posy: int | float,
-                          font: ImageFont.ImageFont | ImageFont.FreeTypeFont):
+                          font_size: int,
+                          font_url: str | None):
     draw = ImageDraw.Draw(image)
+    font = load_font(font_url, font_size)
     draw.text((posx + 2, posy + 2), text, font=font, fill='black')
     draw.text((posx, posy), text, font=font, fill='white')
 
@@ -40,8 +50,10 @@ def draw_motd_text_with_shadow(image: Image.Image,
                                text: str,
                                posx: int | float,
                                posy: int | float,
-                               font: ImageFont.ImageFont | ImageFont.FreeTypeFont):
+                               font_size: int,
+                               font_url: str | None):
     draw = ImageDraw.Draw(image)
+    font = load_font(font_url, font_size)
     motd_list = foramt_motd(text.strip(), draw, font)
     for pos, color, text in motd_list:
         draw.text((posx + pos + 1, posy + 1), text, font=font, fill='black')
@@ -89,12 +101,6 @@ def create_image(background: bytes,
                                                        Image.Resampling.LANCZOS)
 
     image.paste(small_image, (int(width / 3 - small_size), int(height / 2 - small_size / 2)))
-
-    # 设置字体
-    if font_url == None:
-        font = ImageFont.load_default(font_size)
-    else:
-        font = ImageFont.truetype(font_url, font_size)
     
     text_list_size = len(text_list)
     motd_list_size = len(motd_list)
@@ -104,12 +110,14 @@ def create_image(background: bytes,
                                    motd_list[i],
                                    width / 2.5,
                                    start_posy + font_size * 1.2 * i,
-                                   font)
+                                   int(font_size * 0.8),
+                                   font_url)
     for i in range(text_list_size):
         draw_text_with_shadow(image,
                               text_list[i],
                               width / 2.5,
                               start_posy + font_size * 1.2 * (i + motd_list_size),
-                              font)
+                              font_size,
+                              font_url)
     
     return image
