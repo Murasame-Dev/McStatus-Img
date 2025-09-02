@@ -1,9 +1,6 @@
 from .get_background import download_image_with_httpx_auto_redirect
 import asyncio
 
-# BACKGROUND_URL = "https://www.loliapi.com/acg/"
-# DEFAULT_ICON = "./minecraft-creeper-face.png"
-
 async def get_icon_image(url: str):
     if url.startswith("http"):
         icon_data = await download_image_with_httpx_auto_redirect(url)

@@ -31,9 +31,9 @@ def draw_text_with_shadow(image: Image.Image,
                           text: str,
                           posx: int,
                           posy: int,
-                          font_size: int):
+                          font_size: int,
+                          font):
     draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype("./MiSans-Bold.ttf", font_size)
     draw.text((posx + 2, posy + 2), text, font=font, fill='black')
     draw.text((posx, posy), text, font=font, fill='white')
 
@@ -41,9 +41,9 @@ def draw_motd_text_with_shadow(image: Image.Image,
                                text: str,
                                posx: int,
                                posy: int,
-                               font_size: int):
+                               font_size: int,
+                               font):
     draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype("./MiSans-Bold.ttf", font_size)
     w1, _, w2, _ = draw.textbbox((0, 0), text.strip(), font=font)
     weight = w2 - w1
     motd_list = foramt_motd(text.strip(), weight)
@@ -56,9 +56,17 @@ def draw_motd_text_with_shadow(image: Image.Image,
 def create_image(background: bytes,
                  icon: str | None,
                  text_list: list[str],
-                 motd_list: list[str]):
+                 motd_list: list[str],
+                 font_url: str | None,
+                 image_size: list[int]):
     # 图片尺寸
-    width, height = 1200, 400
+    if image_size == [0, 0] or image_size == []:
+        width = 1200
+        height = 400
+    else:
+        width = image_size[0]
+        height = image_size[1]
+        
     if (len(text_list) + len(motd_list)) * 20 + 20 > height:
         height = (len(text_list) + len(motd_list)) * 20 + 20
     else:
@@ -74,7 +82,7 @@ def create_image(background: bytes,
     # 添加半透明蒙版层以增强文字可读性
     overlay = Image.new('RGBA', (width, height), (0, 0, 0, 80))  # 半透明黑色蒙版
     image.paste(overlay, (0, 0), overlay)
-
+    
     if width // 2 > height:
         small_size = int(height * 0.8)
     else:
@@ -87,6 +95,12 @@ def create_image(background: bytes,
 
     image.paste(small_image, (30, height // 2 - small_size // 2))
 
+    # 设置字体
+    if font_url == None:
+        font = ImageFont.load_default(font_size)
+    else:
+        font = ImageFont.truetype(font_url, font_size)
+    
     text_list_size = len(text_list)
     motd_list_size = len(motd_list)
     start_posy = height / 2 - (text_list_size + motd_list_size) / 2 * font_size * 1.2
@@ -95,12 +109,14 @@ def create_image(background: bytes,
                                    motd_list[i],
                                    width // 2.5,
                                    start_posy + font_size * 1.2 * i,
-                                   int(font_size * 0.8))
+                                   int(font_size * 0.8),
+                                   font)
     for i in range(text_list_size):
         draw_text_with_shadow(image,
                               text_list[i],
                               width // 2.5,
                               start_posy + font_size * 1.2 * (i + motd_list_size),
-                              font_size)
+                              font_size,
+                              font)
     
     return image
