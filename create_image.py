@@ -69,8 +69,7 @@ def create_image(background: bytes,
         
     if (len(text_list) + len(motd_list)) * 20 + 20 > height:
         height = (len(text_list) + len(motd_list)) * 20 + 20
-    else:
-        font_size = height // 12
+    font_size = height // 12
     if font_size * 20 > width - width // 2.5:
         font_size = (width - width // 2.5) // 20
     
