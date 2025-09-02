@@ -63,8 +63,8 @@ def foramt_motd(data: str,
                     color_state = format_color(color)
                 w1, _, w2, _ = draw.textbbox((0, 0), text, font=font)
                 seg_weight = w2 - w1
-                weight_count += seg_weight
                 motd_list.append((weight_count, color_state, text))
+                weight_count += seg_weight
             else:
                 iter += 1
         else:
@@ -74,6 +74,6 @@ def foramt_motd(data: str,
                 iter += 1
             w1, _, w2, _ = draw.textbbox((0, 0), text, font=font)
             seg_weight = w2 - w1
-            weight_count += seg_weight
             motd_list.append((weight_count, "#FFFFFF", text))
+            weight_count += seg_weight
     return motd_list
