@@ -82,7 +82,6 @@ def create_image(background: bytes,
     # 添加半透明蒙版层以增强文字可读性
     overlay = Image.new('RGBA', (width, height), (0, 0, 0, 80))  # 半透明黑色蒙版
     image.paste(overlay, (0, 0), overlay)
-    
     if width // 2 > height:
         small_size = int(height * 0.8)
     else:
