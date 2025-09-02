@@ -1,3 +1,0 @@
-[submodule "api"]
-	path = mc_status_api
-	url = https://github.com/Murasame-Dev/McStatus-API.git
