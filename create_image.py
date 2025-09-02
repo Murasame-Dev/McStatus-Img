@@ -1,13 +1,8 @@
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from io import BytesIO
 from PIL.ImageColor import getrgb
-import asyncio
 
 from .motd_formatter import foramt_motd
-from .get_background import download_image_with_httpx_auto_redirect
-
-BACKGROUND_URL = "https://www.loliapi.com/acg/"
-DEFAULT_ICON = "./minecraft-creeper-face.png"
 
 def create_background(input: bytes, width: int, height: int):
     background = Image.open(BytesIO(input))
@@ -109,17 +104,3 @@ def create_image(background: bytes,
                               font_size)
     
     return image
-
-async def get_icon_image(url: str):
-    if url.startswith("http"):
-        icon_data = await download_image_with_httpx_auto_redirect(url)
-        if icon_data:
-            return icon_data
-        else:
-            return None
-    else:
-        def read_file(path):
-            with open(path, "rb") as f:
-                return f.read()
-        loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(None, read_file, url)
