@@ -29,8 +29,8 @@ def create_background(input: bytes, width: int, height: int):
 
 def draw_text_with_shadow(image: Image.Image,
                           text: str,
-                          posx: int,
-                          posy: int,
+                          posx: int | float,
+                          posy: int | float,
                           font):
     draw = ImageDraw.Draw(image)
     draw.text((posx + 2, posy + 2), text, font=font, fill='black')
@@ -38,8 +38,8 @@ def draw_text_with_shadow(image: Image.Image,
 
 def draw_motd_text_with_shadow(image: Image.Image,
                                text: str,
-                               posx: int,
-                               posy: int,
+                               posx: int | float,
+                               posy: int | float,
                                font):
     draw = ImageDraw.Draw(image)
     w1, _, w2, _ = draw.textbbox((0, 0), text.strip(), font=font)
@@ -93,7 +93,7 @@ def create_image(background: bytes,
         small_image = Image.open(BytesIO(icon)).resize((small_size, small_size),
                                                        Image.Resampling.LANCZOS)
 
-    image.paste(small_image, (30, height // 2 - small_size // 2))
+    image.paste(small_image, (int(width / 2.6 - small_size / 2), int(height / 2 - small_size / 2)))
 
     # 设置字体
     if font_url == None:
