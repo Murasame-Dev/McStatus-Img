@@ -42,7 +42,7 @@ def draw_motd_text_with_shadow(image: Image.Image,
                                posy: int | float,
                                font: ImageFont.ImageFont | ImageFont.FreeTypeFont):
     draw = ImageDraw.Draw(image)
-    motd_list = foramt_motd(text.strip(), draw)
+    motd_list = foramt_motd(text.strip(), draw, font)
     for pos, color, text in motd_list:
         draw.text((posx + pos + 1, posy + 1), text, font=font, fill='black')
         draw.text((posx + pos, posy), text, font=font, fill=getrgb(color))
